@@ -119,3 +119,72 @@ PS：
 4. 系数$\alpha_m$表示了基本分类器$G_m(x)$的重要性，所有$\alpha_m$之和并不为1。
 
 5. $f(x)$的符号决定实例$x$的类，$f(x)$的绝对值表示分类的确信度。
+
+
+
+## 前向分布算法
+
+输入：训练数据集$T=\{(x_1,y_1),(x_2,y_2), \dotsb, (x_N,y_N) \}, \space  x_i \in \chi \sube R^n,, \space y_i \in Y=\{ -1,+1 \}$；损失函数$L(y,f(x))$；基函数集$\{b(x;\gamma\}$；
+
+输出：加法模型$f(x)$
+
+步骤：
+
+1. 初始化$f_0(x)=0$
+
+2. 对$m=1,2,\dotsb,M$
+
+   * 极小化损失函数
+     $$
+     (\beta_m,\gamma_m) = \arg \min_{\beta,\gamma} \sum_{i=1}^N {L(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))}
+     $$
+     得到参数$\beta_m,\gamma_m$
+
+   * 更新
+     $$
+     f_m(x)=f_{m-1}(x)+\beta_m b(x;\gamma_m)
+     $$
+
+   * 得到加法模型
+     $$
+     f(x)=f_M(x)=\sum_{m=1}^M \beta_m b(x;\gamma_m)
+     $$
+
+
+
+## 提升树(GBDT Gradient Boosting Decision Tree)
+
+提升树模型可以表示为决策树的加法模型：
+$$
+f_M(x)=\sum_{m=1}^M T(x;\varTheta_m)
+$$
+其中，$T(x;\varTheta_m)$表示决策树；$\varTheta_m$为决策树的参数；$M$为树的个数
+
+
+
+回归问题的提升树算法：
+
+输入：训练数据集$T=\{ (x_1,y_1),(x_2,y_2), \dotsb , (x_N,y_N) \} , \space x_i \in \chi \sube R^n, \space y_i \in Y \sube R$
+
+输出：提升树$f_M(x)$
+
+算法步骤：
+
+1. 初始化$f_0(x)=0$
+
+2. 对$m=1,2,\dotsb,M$
+
+   * 计算残差
+     $$
+     r_{mi}=y_i - f_{m-1}(x_i), \space i=1,2,\dotsb,N
+     $$
+
+   * 拟合残差$r_{mi}$学习一个回归树，得到$T(x;\varTheta_m)$
+
+   * 更新$f_m(x)=f_{m-1}(x)+T(x;\varTheta_m)$
+
+3. 得到回归问题提升树
+   $$
+   f_M(x)=\sum_{m=1}^M T(x;\varTheta_m)
+   $$
+   
