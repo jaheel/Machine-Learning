@@ -51,3 +51,71 @@
 
 
 
+算法：
+
+1. 初始化训练数据的权值分布(保证第1步能够在原始数据上学习基本分类器$G_1(x)$)
+   $$
+   D_1 = (w_{11},\dotsb,w_{1i},\dotsb,w_{1N}), \space\space w_{1i}=\frac{1}{N}, \space \space i=1,2, \dotsb,N
+   $$
+
+2. 对$m=1,2,\dotsb,M$
+
+   * 使用具有权值分布$D_m$的训练数据集学习，得到基本分类器
+     $$
+     G_m(x): \chi \to \{-1,+1\}
+     $$
+
+   * 计算$G_m(x)$在训练数据集上的分类误差率($w_{mi}$表示第$m$轮中第$i$个实例的权值)
+     $$
+     e_m = P(G_m(x_i) \ne y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i) \ne y_i) \\
+     \sum_{i=1}^N w_{mi} =1
+     $$
+
+   * 计算$G_m(x)$的系数
+     $$
+     \alpha_m = \frac{1}{2} \log{\frac{1-e_m}{e_m}}
+     $$
+
+   * 更新训练数据集的权值分布
+     $$
+     D_{m+1}=(w_{m+1,1}, \dotsb, w_{m+1,i}, \dotsb, w_{m+1,N}) \\
+     w_{m+1,i}=\frac{w_{mi}}{Z_m} \exp{(-\alpha_m y_i G_m(x_i))}, \space \space i=1,2,\dotsb,N \\
+     Z_m = \sum_{i=1}^N {w_{mi} \exp{(-\alpha_m y_i G_m(x_i))}}
+     $$
+     使$D_{m+1}$成为一个概率分布
+
+3. 构建基本分类器的线性组合
+   $$
+   f(x)=\sum_{m=1}^M \alpha_m G_m(x)
+   $$
+   得到最终分类器
+   $$
+   G(x)=sign(f(x))=sign(\sum_{m=1}^M \alpha_m G_m(x))
+   $$
+   
+
+
+
+PS：
+
+1. 基本分类器$G_m(x)$在加权训练数据集上的分类误差率：
+   $$
+   e_m = P(G_m(x_i) \ne y_i) = \sum_{G_m(x_i) \ne y_i} w_{mi}
+   $$
+
+2. $\alpha_m$表示$G_m(x)$在最终分类器中的重要性
+
+   > 当$e_m \le \frac{1}{2}时, \alpha_m \ge 0$，并且$\alpha_m$随着$e_m$的减小而增大，所以分类误差率越小的基本分类器在最终分类器中的作用越大。
+
+3. 更新训练数据的权值分布为下一轮作准备
+   $$
+   w_{m+1,i}= \begin{cases}
+   \frac{w_{mi}}{Z_m} e^{-\alpha_m}, & G_m(x_i)=y_i \\
+   \frac{w_{mi}}{Z_m} e^{\alpha_m}, & G_m(x_i) \ne y_i
+   \end{cases}
+   $$
+   被基本分类器$G_m(x)$误分类样本的权值得以扩大，而被正确分类样本的权值却得以缩小。
+
+4. 系数$\alpha_m$表示了基本分类器$G_m(x)$的重要性，所有$\alpha_m$之和并不为1。
+
+5. $f(x)$的符号决定实例$x$的类，$f(x)$的绝对值表示分类的确信度。
